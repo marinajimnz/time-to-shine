@@ -2,13 +2,12 @@ import { useState } from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import photo1 from '/src/assets/IMG_3966.jpeg';
+import photo2 from '/src/assets/IMG_3967.jpeg';
+import photo3 from '/src/assets/IMG_3968.jpeg';
 
 const PhotoUpload = () => {
-  const [photos, setPhotos] = useState([
-    'src/assets/IMG_3966.jpeg',
-    'src/assets/IMG_3967.jpeg',
-    'src/assets/IMG_3968.jpeg',
-  ]);
+  const [photos, setPhotos] = useState([photo1, photo2, photo3]);
   const [newPhoto, setNewPhoto] = useState(null);
   const [selectedPhoto, setSelectedPhoto] = useState(null); // Para almacenar la foto seleccionada
   const [comment, setComment] = useState(''); // Para almacenar el comentario actual
