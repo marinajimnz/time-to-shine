@@ -4,7 +4,7 @@ import ProfilePage from './pages/ProfilePage';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/time-to-shine">
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/profile" element={<ProfilePage />} />
