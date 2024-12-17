@@ -1,6 +1,6 @@
 <img src="public/logo.svg" align="center" style="width: 50%" />
 
-**Time To Shine** is the official application for tracking and celebrating the teams competing in the **Fitboxing World Games (FWG)** by Brooklyn Fitboxing. Inspired by the FWG battle cry, "It's time to shine," this app helps capture the energy and determination of these games.
+**Time To Shine** is an application made by a fitboxer, for tracking and celebrating the teams competing in the **Fitboxing World Games (FWG)** by Brooklyn Fitboxing. Inspired by the FWG battle cry, "It's time to shine," this app helps capture the energy and determination of these games.
 
 ## Features
 
