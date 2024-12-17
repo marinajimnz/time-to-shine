@@ -6,21 +6,23 @@ import PhotoUpload from '../components/PhotoUpload';
 import TodoList from '../components/TodoList';
 
 const ProfilePage = ({ user }) => {
-  const [teamData, setTeamData] = useState(
-    {
-      logo: '',
-      teamName: '',
-      photos: [],
+  const [teamData, setTeamData] = useState({
+    logo: '',
+    teamName: '',
+    photos: [],
   });
 
-  useEffect (() => {
+  useEffect(() => {
     if (user) {
-      // Extract the team data from the user object
-      const teamName = user.get('teamName'); // Team name
-      const logo = user.get('logo')?.url(); // Logo url
-      const photos = user.get('photos') || []; // Array of photos
+      // Extraemos los datos del equipo del objeto de usuario
+      const teamName = user.get('teamName'); // Nombre del equipo
+      const logo = user.get('logo'); // Obtenemos el objeto Parse.File de logo
+      const photos = user.get('photos') || []; // Array de fotos
 
-      setTeamData({ logo, teamName, photos });
+      // Si el logo es un objeto Parse.File, obtenemos la URL
+      const logoUrl = logo instanceof Parse.File ? logo.url() : '';
+
+      setTeamData({ logo: logoUrl, teamName, photos });
     }
   }, [user]);
 
@@ -28,7 +30,8 @@ const ProfilePage = ({ user }) => {
     <>
       {/* Barra de navegación */}
       <nav className="bg-secondary-gray w-full px-4 py-3 flex justify-between items-center">
-        <Profile teamData={teamData.logo} setTeamData={setTeamData} />
+        {/* Pasamos el objeto teamData completo */}
+        <Profile teamData={teamData} setTeamData={setTeamData} />
         <button
           className="rounded-lg border border-transparent px-4 py-2 
                     text-base font-medium bg-star-orange text-primary-gray 
@@ -44,7 +47,7 @@ const ProfilePage = ({ user }) => {
       </nav>
 
       {/* Carrusel de fotos */}
-      <PhotoUpload photos={teamData.photos}/>
+      <PhotoUpload photos={teamData.photos} />
 
       {/* Lista de tareas */}
       <TodoList />

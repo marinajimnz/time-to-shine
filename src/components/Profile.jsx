@@ -1,51 +1,68 @@
 /* eslint-disable react/prop-types */
 import { useState } from 'react';
 import Parse from '../parseConfig';
-import logo from '/public/logo.svg';
+import logoPredef from '/public/logo.svg';
 
 const Profile = ({ teamData, setTeamData }) => {
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null); // Estado para almacenar el archivo seleccionado
+  const [selectedFile, setSelectedFile] = useState(null); // Almacena el archivo seleccionado
 
-  // Manejar la selección del archivo
+  // Función para manejar la selección del archivo
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedFile(file); // Guarda temporalmente el archivo
+      setSelectedFile(file);
+      console.log('Archivo seleccionado:', file);
     }
   };
 
-  // Guardar la foto seleccionada en Back4App
+  // Función para guardar la foto en Back4App
   const handleSavePhoto = async () => {
-    if (selectedFile) {
+    if (!selectedFile) {
+      console.error('No se ha seleccionado ningún archivo.');
+      return;
+    }
+
+    try {
+      // Crear el archivo Parse.File
       const parseFile = new Parse.File(selectedFile.name, selectedFile);
-      try {
-        // Guarda el archivo en Back4App
-        await parseFile.save();
+      console.log('Guardando archivo en Parse...', parseFile);
 
-        // Actualiza el usuario actual en Back4App
-        const currentUser = Parse.User.current();
-        currentUser.set('logo', parseFile);
-        await currentUser.save();
+      // Guardar el archivo en Back4App
+      await parseFile.save();
+      console.log('Archivo guardado con éxito:', parseFile.url());
 
-        // Actualiza el estado local con la nueva URL de la foto
-        setTeamData((prevData) => ({ ...prevData, logo: parseFile.url() }));
-        setIsPhotoModalOpen(false); // Cierra el modal
-        setSelectedFile(null); // Limpia el archivo seleccionado
-      } catch (error) {
-        console.error('Error while saving the photo:', error.message);
+      // Obtener el usuario actual
+      const currentUser = Parse.User.current();
+      if (!currentUser) {
+        console.error('No hay ningún usuario autenticado.');
+        return;
       }
+
+      // Asignar el logo al usuario y guardar los cambios
+      currentUser.set('logo', parseFile);
+      await currentUser.save();
+
+      // Actualizar el estado local para reflejar el nuevo logo
+      setTeamData((prevData) => ({ ...prevData, logo: parseFile.url() }));
+
+      // Cerrar el modal y restablecer el archivo seleccionado
+      setIsPhotoModalOpen(false);
+      setSelectedFile(null);
+    } catch (error) {
+      console.error('Error al guardar la foto en Back4App:', error.message);
     }
   };
 
   return (
     <div>
+      {/* Imagen de perfil y nombre */}
       <div
         className="flex items-center cursor-pointer"
         onClick={() => setIsPhotoModalOpen(true)}
       >
         <img
-          src={teamData.logo || logo} // Imagen por defecto si no hay logo
+          src={teamData.logo || logoPredef}
           alt="Profile logo"
           className="h-20 w-20 rounded-full border border-star-orange"
         />
@@ -83,7 +100,7 @@ const Profile = ({ teamData, setTeamData }) => {
                          file:focus:outline-auto focus:ring-2 file:focus:ring-primary-white"
             />
 
-            {/* Botón de confirmación */}
+            {/* Botón para guardar la foto */}
             <button
               onClick={handleSavePhoto}
               className="mt-4 px-6 py-2 bg-star-orange text-primary-gray rounded-lg hover:border-primary-white focus:outline-none focus:ring-2 focus:ring-primary-white"
