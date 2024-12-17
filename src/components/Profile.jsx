@@ -1,11 +1,28 @@
 /* eslint-disable react/prop-types */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Parse from '../parseConfig';
 import logoPredef from '/public/logo.svg';
 
 const Profile = ({ teamData, setTeamData }) => {
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null); // Almacena el archivo seleccionado
+
+  // useEffect para recuperar el logo del usuario cuando el componente se monta
+  useEffect(() => {
+    const fetchUserLogo = async () => {
+      const currentUser = Parse.User.current();
+      if (currentUser) {
+        // Obtener el logo del usuario y actualizar el estado
+        const logo = currentUser.get('logo')?.url(); // Si existe el logo
+        setTeamData((prevData) => ({
+          ...prevData,
+          logo: logo || prevData.logo, // Si el logo no existe, mantener el valor anterior
+        }));
+      }
+    };
+
+    fetchUserLogo(); // Llamar a la función para obtener el logo
+  }, [setTeamData]); // Dependencia de setTeamData para garantizar que se actualice correctamente
 
   // Función para manejar la selección del archivo
   const handleFileChange = (e) => {
