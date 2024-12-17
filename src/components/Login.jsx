@@ -1,16 +1,24 @@
+/* eslint-disable react/prop-types */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Parse from '../parseConfig'; // Imports our Parse configuration
 
-const Login = () => {
+const Login = ({onLoginSuccess}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (username == "prueba" && password == "prueba") {
-      navigate('/profile'); // Aquí rediriges al perfil después de iniciar sesión
-    } else {
-      alert('Por favor, escribe un usuario y contraseña válidos.');
+  const handleLogin = async () => {
+    try {
+      // User validation w/ Back4App
+      const user = await Parse.User.logIn(username, password);
+      console.log('Logged in!', user);
+      onLoginSuccess(user); // Calls the onLoginSuccess function passed as a prop
+      navigate('/profile'); // Redirects to the profile page
+    } catch (error) {
+      console.error('Error while logging in:', error);
+      setError('Usuario o contraseña incorrectos');
     }
   };
 
