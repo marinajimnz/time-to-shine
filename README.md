@@ -30,7 +30,7 @@ Time To Shine is built with:
 
 ## Deployment
 
-The application is deployed on **GitHub Pages** for easy access and distribution. You can view the live app [here](https://marinajimnz.github.io/time-to-shine/profile).
+The application is deployed on **GitHub Pages** for easy access and distribution. You can view the live app [here](https://marinajimnz.github.io/time-to-shine/).
 
 ## Getting Started
 
