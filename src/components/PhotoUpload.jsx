@@ -9,9 +9,9 @@ import photo3 from '/src/assets/IMG_3968.jpeg';
 const PhotoUpload = () => {
   const [photos, setPhotos] = useState([photo1, photo2, photo3]);
   const [newPhoto, setNewPhoto] = useState(null);
-  const [selectedPhoto, setSelectedPhoto] = useState(null); // Para almacenar la foto seleccionada
-  const [comment, setComment] = useState(''); // Para almacenar el comentario actual
-  const [comments, setComments] = useState([]); // Para almacenar todos los comentarios de la foto seleccionada
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [comment, setComment] = useState('');
+  const [comments, setComments] = useState([]);
 
   const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
@@ -23,23 +23,23 @@ const PhotoUpload = () => {
   };
 
   const handlePhotoClick = (photo) => {
-    setSelectedPhoto(photo); // Al hacer clic, ampliamos la foto
-    setComments([]); // Limpiar los comentarios al seleccionar una nueva foto
+    setSelectedPhoto(photo);
+    setComments([]);
   };
 
   const handleCloseModal = () => {
-    setSelectedPhoto(null); // Cerrar la vista ampliada
+    setSelectedPhoto(null);
   };
 
   const handleCommentChange = (e) => {
-    setComment(e.target.value); // Actualizar el comentario
+    setComment(e.target.value);
   };
 
   const handleCommentSubmit = (e) => {
     e.preventDefault();
     if (comment.trim()) {
-      setComments([...comments, comment]); // Agregar el comentario al array de comentarios
-      setComment(''); // Limpiar el campo de comentario
+      setComments([...comments, comment]);
+      setComment('');
     }
   };
 
@@ -57,7 +57,6 @@ const PhotoUpload = () => {
 
   return (
     <div className="photo-upload-section m-4 px-6">
-      {/* Encabezado y botón de subir archivo */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold text-center">Galería del equipo</h2>
         <label
@@ -74,11 +73,10 @@ const PhotoUpload = () => {
           type="file"
           accept="image/* video/*"
           onChange={handlePhotoUpload}
-          className="hidden" // Ocultar input de archivo
+          className="hidden"
         />
       </div>
 
-      {/* Slider de fotos */}
       <Slider {...settings}>
         {photos.map((photo, index) => (
           <div key={index} className="flex justify-center">
@@ -86,43 +84,38 @@ const PhotoUpload = () => {
               src={photo}
               alt={`Photo ${index + 1}`}
               className="h-auto w-auto rounded-lg shadow-lg cursor-pointer"
-              onClick={() => handlePhotoClick(photo)} // Hacer clic para ampliar la foto
+              onClick={() => handlePhotoClick(photo)}
             />
           </div>
         ))}
       </Slider>
 
-      {/* Modal para ver la foto ampliada */}
       {selectedPhoto && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-secondary-gray p-4 rounded-lg max-w-3xl w-full relative">
-            <div className="relative">
-                {/* Botón de cierre */}    
-                <button
-                  onClick={handleCloseModal}
-                  className="absolute top-2 right-2 text-star-orange text-2xl 
-                  focus:outline-none mr-2"
-                >
-                  X
-                </button>
-              </div>
+          <div className="bg-secondary-gray p-4 rounded-lg w-96 relative">
+            <button
+              onClick={handleCloseModal}
+              className="absolute top-2 right-2 rounded-lg border border-transparent px-4 py-2 
+              text-base font-medium bg-star-orange text-primary-gray 
+              hover:border-primary-white focus:outline-none focus:ring-2 focus:ring-primary-white"
+            >
+              X
+            </button>
             <img
               src={selectedPhoto}
               alt="Expanded"
-              className="max-w-full h-auto rounded-lg"
+              className="max-w-full h-auto rounded-lg mb-4"
             />
-
-            {/* Formulario de comentario */}
-            <form onSubmit={handleCommentSubmit} className="mt-4">
+            <form onSubmit={handleCommentSubmit} className="mt-2">
               <textarea
                 value={comment}
                 onChange={handleCommentChange}
                 placeholder="Añadir un comentario..."
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-2 border rounded-lg resize-none"
               />
               <button
                 type="submit"
-                className="rounded-lg border border-transparent px-4 py-2 
+                className="mt-2 rounded-lg border border-transparent px-4 py-2 
                             text-base font-medium bg-star-orange text-primary-gray 
                             hover:border-primary-white 
                             focus:outline-auto focus:ring-2 focus:ring-primary-white"
@@ -130,8 +123,6 @@ const PhotoUpload = () => {
                 Enviar
               </button>
             </form>
-
-            {/* Mostrar los comentarios debajo de la foto */}
             <div className="mt-4">
               <h3 className="font-semibold">Comentarios:</h3>
               <ul>
