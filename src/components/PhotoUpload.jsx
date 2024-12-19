@@ -2,45 +2,37 @@ import { useState } from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import { PlusIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon } from '@heroicons/react/20/solid';
+import Comments from '/src/components/CommentSection.jsx'; // Importamos el nuevo componente.
 import photo1 from '/src/assets/IMG_3966.jpeg';
 import photo2 from '/src/assets/IMG_3967.jpeg';
 import photo3 from '/src/assets/IMG_3968.jpeg';
 
 const PhotoUpload = () => {
   const [photos, setPhotos] = useState([photo1, photo2, photo3]);
-  const [newPhoto, setNewPhoto] = useState(null);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const [comment, setComment] = useState('');
-  const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState([]); // Lista de comentarios.
 
   const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const newPhotoUrl = URL.createObjectURL(file);
       setPhotos([...photos, newPhotoUrl]);
-      setNewPhoto(null);
     }
   };
 
   const handlePhotoClick = (photo) => {
     setSelectedPhoto(photo);
-    setComments([]);
+    setComments([]); // Resetea los comentarios al cambiar de foto.
   };
 
   const handleCloseModal = () => {
     setSelectedPhoto(null);
   };
 
-  const handleCommentChange = (e) => {
-    setComment(e.target.value);
-  };
-
-  const handleCommentSubmit = (e) => {
-    e.preventDefault();
-    if (comment.trim()) {
-      setComments([...comments, comment]);
-      setComment('');
-    }
+  const handleAddComment = (newComment) => {
+    setComments([...comments, newComment]); // Agrega un nuevo comentario.
   };
 
   const settings = {
@@ -66,7 +58,7 @@ const PhotoUpload = () => {
                     hover:border-primary-white 
                     focus:outline-auto focus:ring-2 focus:ring-primary-white"
         >
-          +
+          <PlusIcon className="h-4 w-4" />
         </label>
         <input
           id="file-upload"
@@ -99,38 +91,15 @@ const PhotoUpload = () => {
               text-base font-medium bg-star-orange text-primary-gray 
               hover:border-primary-white focus:outline-none focus:ring-2 focus:ring-primary-white"
             >
-              X
+              <XMarkIcon className="h-5 w-5" />
             </button>
             <img
               src={selectedPhoto}
               alt="Expanded"
               className="max-w-full h-auto rounded-lg mb-4"
             />
-            <form onSubmit={handleCommentSubmit} className="mt-2">
-              <textarea
-                value={comment}
-                onChange={handleCommentChange}
-                placeholder="Añadir un comentario..."
-                className="w-full p-2 border rounded-lg resize-none"
-              />
-              <button
-                type="submit"
-                className="mt-2 rounded-lg border border-transparent px-4 py-2 
-                            text-base font-medium bg-star-orange text-primary-gray 
-                            hover:border-primary-white 
-                            focus:outline-auto focus:ring-2 focus:ring-primary-white"
-              >
-                Enviar
-              </button>
-            </form>
-            <div className="mt-4">
-              <h3 className="font-semibold">Comentarios:</h3>
-              <ul>
-                {comments.map((comment, index) => (
-                  <li key={index} className="border-b py-2">{comment}</li>
-                ))}
-              </ul>
-            </div>
+            {/* Usamos el componente Comments */}
+            <Comments comments={comments} onAddComment={handleAddComment} />
           </div>
         </div>
       )}

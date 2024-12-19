@@ -1,121 +1,114 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from 'react';
-import Parse from '../parseConfig';
-import logoPredef from '/public/logo.svg';
+import Parse from '../parseConfig'; // Importing the Parse configuration for Back4App.
+import logoPredef from '/public/logo.svg'; // Default logo for the profile.
 
 const Profile = ({ teamData, setTeamData }) => {
-  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false); // State to manage the visibility of the photo modal.
+  const [selectedFile, setSelectedFile] = useState(null); // State to handle the file selected for upload.
 
-  // useEffect para recuperar el logo del usuario cuando el componente se monta
+  // useEffect to fetch the user's logo when the component mounts.
   useEffect(() => {
     const fetchUserLogo = async () => {
       try {
-        const currentUser = Parse.User.current();
+        const currentUser = Parse.User.current(); // Retrieve the current authenticated user.
         if (currentUser) {
-          // Verificar si existe un logo y que sea un objeto válido de Parse.File
-          const logo = currentUser.get('logo');
-          const logoUrl = logo && typeof logo.url === 'function' ? logo.url() : null;
+          const logo = currentUser.get('logo'); // Get the user's logo.
+          const logoUrl = logo && typeof logo.url === 'function' ? logo.url() : null; // Validate and get the logo URL.
 
-          // Actualizar el estado de teamData con el logo si existe
+          // Update teamData state with the logo.
           setTeamData((prevData) => ({
             ...prevData,
-            logo: logoUrl || prevData.logo, // Si no hay logo, mantener el predeterminado
+            logo: logoUrl || prevData.logo, // Keep the default logo if none exists.
           }));
         }
       } catch (error) {
-        console.error('Error al obtener el logo del usuario:', error.message);
+        console.error('Error fetching the user logo:', error.message);
       }
     };
 
     fetchUserLogo();
   }, [setTeamData]);
 
-  // Función para manejar la selección del archivo
+  // Handles file selection when uploading a new profile photo.
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedFile(file);
-      console.log('Archivo seleccionado:', file);
+      setSelectedFile(file); // Updates the state with the selected file.
+      console.log('File selected:', file);
     }
   };
 
-  // Función para guardar la foto en Back4App
+  // Saves the selected photo to Back4App.
   const handleSavePhoto = async () => {
     if (!selectedFile) {
-      console.error('No se ha seleccionado ningún archivo.');
+      console.error('No file selected.');
       return;
     }
 
     try {
-      // Crear el archivo Parse.File
-      const parseFile = new Parse.File(selectedFile.name, selectedFile);
-      console.log('Guardando archivo en Parse...', parseFile);
+      const parseFile = new Parse.File(selectedFile.name, selectedFile); // Creates a Parse file object.
+      console.log('Saving file to Parse...', parseFile);
 
-      // Guardar el archivo en Back4App
-      await parseFile.save();
-      console.log('Archivo guardado con éxito:', parseFile.url());
+      await parseFile.save(); // Saves the file to Back4App.
+      console.log('File saved successfully:', parseFile.url());
 
-      // Obtener el usuario actual
-      const currentUser = Parse.User.current();
+      const currentUser = Parse.User.current(); // Gets the current authenticated user.
       if (!currentUser) {
-        console.error('No hay ningún usuario autenticado.');
+        console.error('No authenticated user.');
         return;
       }
 
-      // Asignar el logo al usuario y guardar los cambios
-      currentUser.set('logo', parseFile);
-      await currentUser.save();
+      currentUser.set('logo', parseFile); // Assigns the uploaded file as the user's logo.
+      await currentUser.save(); // Saves the changes to the user object.
 
-      // Actualizar el estado local para reflejar el nuevo logo
-      setTeamData((prevData) => ({ ...prevData, logo: parseFile.url() }));
+      setTeamData((prevData) => ({ ...prevData, logo: parseFile.url() })); // Updates the local state with the new logo.
 
-      // Cerrar el modal y restablecer el archivo seleccionado
-      setIsPhotoModalOpen(false);
-      setSelectedFile(null);
+      setIsPhotoModalOpen(false); // Closes the modal.
+      setSelectedFile(null); // Resets the file selection.
     } catch (error) {
-      console.error('Error al guardar la foto en Back4App:', error.message);
+      console.error('Error saving the photo to Back4App:', error.message);
     }
   };
 
   return (
     <div>
-      {/* Imagen de perfil y nombre */}
+      {/* Profile image and team name */}
       <div
         className="flex items-center cursor-pointer"
-        onClick={() => setIsPhotoModalOpen(true)}
+        onClick={() => setIsPhotoModalOpen(true)} // Opens the photo modal.
       >
         <img
-          src={teamData.logo || logoPredef}
+          src={teamData.logo || logoPredef} // Displays the current logo or default logo.
           alt="Profile logo"
           className="h-20 w-20 rounded-full border border-star-orange"
         />
         <span className="ml-4 text-xl font-semibold text-primary-white">
-          {teamData.teamName || 'Nombre del equipo'}
+          {teamData.teamName || 'Team Name'} {/* Displays the team's name or a placeholder.*/}
         </span>
       </div>
 
-      {/* Modal para cambiar la foto */}
+      {/* Modal for changing the profile photo */}
       {isPhotoModalOpen && (
         <div className="fixed inset-0 bg-primary-gray bg-opacity-60 flex items-center justify-center z-10">
           <div className="bg-secondary-gray p-6 rounded-lg shadow-lg text-center relative">
-            {/* Botón de cierre */}
+            {/* Close button */}
             <button
               className="absolute top-2 right-2 text-primary-white text-2xl focus:outline-none mr-2"
               onClick={() => setIsPhotoModalOpen(false)}
-              aria-label="Cerrar"
+              aria-label="Close"
             >
               &times;
             </button>
             <h2 className="text-lg font-semibold mb-4 text-primary-white">
-              Cambiar Foto de Perfil
+              Change Profile Photo
             </h2>
 
-            {/* Input para subir la foto */}
+            {/* File input for uploading a photo */}
             <input
               type="file"
               accept="image/*"
-              onChange={handleFileChange}
+              onChange={handleFileChange} // Triggered when a file is selected.
               className="block w-full text-sm text-primary-white mb-4
                          file:mr-4 file:py-2 file:px-4
                          file:rounded-lg file:border file:border-transparent
@@ -124,12 +117,12 @@ const Profile = ({ teamData, setTeamData }) => {
                          file:focus:outline-auto focus:ring-2 file:focus:ring-primary-white"
             />
 
-            {/* Botón para guardar la foto */}
+            {/* Button to save the uploaded photo */}
             <button
               onClick={handleSavePhoto}
               className="mt-4 px-6 py-2 bg-star-orange text-primary-gray rounded-lg hover:border-primary-white focus:outline-none focus:ring-2 focus:ring-primary-white"
             >
-              Guardar Foto
+              Save Photo
             </button>
           </div>
         </div>
