@@ -13,14 +13,21 @@ const Profile = ({ teamData, setTeamData }) => {
       try {
         const currentUser = Parse.User.current(); // Retrieve the current authenticated user.
         if (currentUser) {
-          const logo = currentUser.get('logo'); // Get the user's logo.
-          const logoUrl = logo && typeof logo.url === 'function' ? logo.url() : null; // Validate and get the logo URL.
+          // Fetch the related UserData object
+          const userDataQuery = new Parse.Query('UserData');
+          userDataQuery.equalTo('user', currentUser); // Assume you have a 'user' pointer field in 'UserData' pointing to _User.
+          const userData = await userDataQuery.first(); // Fetch the first result (it should be unique).
 
-          // Update teamData state with the logo.
-          setTeamData((prevData) => ({
-            ...prevData,
-            logo: logoUrl || prevData.logo, // Keep the default logo if none exists.
-          }));
+          if (userData) {
+            const logo = userData.get('logo'); // Get the user's logo from UserData.
+            const logoUrl = logo && typeof logo.url === 'function' ? logo.url() : null; // Validate and get the logo URL.
+
+            // Update teamData state with the logo.
+            setTeamData((prevData) => ({
+              ...prevData,
+              logo: logoUrl || prevData.logo, // Keep the default logo if none exists.
+            }));
+          }
         }
       } catch (error) {
         console.error('Error fetching the user logo:', error.message);
@@ -39,7 +46,7 @@ const Profile = ({ teamData, setTeamData }) => {
     }
   };
 
-  // Saves the selected photo to Back4App.
+  // Saves the selected photo to Back4App and updates UserData.
   const handleSavePhoto = async () => {
     if (!selectedFile) {
       console.error('No file selected.');
@@ -59,10 +66,25 @@ const Profile = ({ teamData, setTeamData }) => {
         return;
       }
 
-      currentUser.set('logo', parseFile); // Assigns the uploaded file as the user's logo.
-      await currentUser.save(); // Saves the changes to the user object.
+      // Fetch UserData for the current user
+      const userDataQuery = new Parse.Query('UserData');
+      userDataQuery.equalTo('user', currentUser); // Fetch UserData where 'user' is a pointer to the _User object.
+      const userData = await userDataQuery.first(); // Get the UserData object.
 
-      setTeamData((prevData) => ({ ...prevData, logo: parseFile.url() })); // Updates the local state with the new logo.
+      if (userData) {
+        // Set the new logo in UserData and save.
+        userData.set('logo', parseFile);
+        await userData.save(); // Save changes to UserData.
+        console.log('Logo updated in UserData:', userData.get('logo').url());
+      } else {
+        console.error('No UserData found for the current user.');
+      }
+
+      // Update the local state to reflect the new logo.
+      setTeamData((prevData) => ({
+        ...prevData,
+        logo: parseFile.url(),
+      }));
 
       setIsPhotoModalOpen(false); // Closes the modal.
       setSelectedFile(null); // Resets the file selection.
